@@ -1,0 +1,17 @@
+{
+  "id": 10,
+  "items": [
+    {
+      "name": "asdfqdwasedw",
+      "age": 400,
+      "number": 3.334,
+      "active": true
+    },
+    {
+      "name": "11",
+      "age": 3000,
+      "number": 3.14,
+      "active": false
+    }
+  ]
+}
