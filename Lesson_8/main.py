@@ -1,0 +1,16 @@
+from os.path import dirname, relpath, join
+BASE_DIR = dirname(relpath(__file__))
+FILE = join(BASE_DIR, "text.txt")
+
+file = open(FILE, 'r')
+print(file.readlines(15))
+print(file.readlines(15))
+print(file.readlines(15))
+print(file.readlines(15))
+print(file.readlines(15))
+print(file.readlines(15))
+print(file.readlines(15))
+print(file.readlines(15))
+print(file.readlines(15))
+print(file.readlines(15))
+file.close()
