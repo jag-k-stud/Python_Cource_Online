@@ -7,10 +7,12 @@ locale.setlocale(locale.LC_ALL, 'ru_RU')
 
 API_KEY = '38d24964d88167b58e762e1d2aaeaaf0'
 
-URL = 'http://api.openweathermap.org/data/2.5/weather?q=Penza&lang=ru&appid=' + API_KEY
-resp = request.urlopen(URL)
-data = json.loads(resp.read().decode('utf-8'))
-json.dump(data, open('weather.json', 'w'), indent=2, ensure_ascii=False)
+def get_data():
+    URL = 'http://api.openweathermap.org/data/2.5/weather?q=Penza&lang=ru&appid=' + API_KEY
+    resp = request.urlopen(URL)
+    data = json.loads(resp.read().decode('utf-8'))
+    json.dump(data, open('weather.json', 'w'), indent=2, ensure_ascii=False)
+    return data
 
 
 def celsius(temperature):
@@ -84,29 +86,36 @@ def wind_direction(deg):
         return "Северо-северо-западое"
 
 
-date = datetime.fromtimestamp(data['dt']).strftime('%X %d %B %Y')
-sunrise = datetime.fromtimestamp(data['sys']['sunrise']).strftime('%X')
-sunset = datetime.fromtimestamp(data['sys']['sunset']).strftime('%X')
+def get_weather():
+    data = get_data()
+    date = datetime.fromtimestamp(data['dt']).strftime('%X %d %B %Y')
+    sunrise = datetime.fromtimestamp(data['sys']['sunrise']).strftime('%X')
+    sunset = datetime.fromtimestamp(data['sys']['sunset']).strftime('%X')
+    main = data['main']
+    wind = data['wind']
 
-print("Погода в городе", data['name'], "на", date, "г.:")
-main = data['main']
-print(' -', celsius(main['temp']) +
-      ', ощущается как', celsius(main['feels_like']))
-print(' - Минимальная темература:', celsius(main['temp_min']))
-print(' - Максимальная температура:', celsius(main['temp_max']))
+    res = ' '.join(("Погода в городе", data['name'], "на", date, "г.:")) + '\n'
+    res += ' '.join((' -', celsius(main['temp']) +
+        ', ощущается как', celsius(main['feels_like']))) + '\n'
+    res += ' '.join((' - Минимальная темература:', celsius(main['temp_min']))) + '\n'
+    res += ' '.join((' - Максимальная температура:', celsius(main['temp_max']))) + '\n'
 
-for weather in data['weather']:
-    print(' -', weather['description'].title())
+    for weather in data['weather']:
+        res += ' '.join((' -', weather['description'].title())) + '\n'
 
-print(' - Атмосферное давление:', main['pressure'], 'ммрс')
-print(' - Влажность воздуха:', str(main['humidity']) + '%')
-print(' - Облачность:', str(data['clouds']['all']) + '%')
-print(' - Видимость: %d%%' % (data['visibility'] / 100))
+    res += ' '.join((' - Атмосферное давление:', str(main['pressure']), 'ммрс')) + '\n'
+    res += ' '.join((' - Влажность воздуха:', str(main['humidity']) + '%')) + '\n'
+    res += ' '.join((' - Облачность:', str(data['clouds']['all']) + '%')) + '\n'
+    res += ' - Видимость: %d%%\n\n' % (data['visibility'] / 100)
 
-wind = data['wind']
-print('\n Ветер:')
-print('  - Скорость:', wind['speed'], 'м/с')
-print('  - Направление:', wind_direction(wind['deg']))
-print()
-print('Закат:', sunset)
-print('Рассвет:', sunrise)
+    res += '  Ветер:\n' + '\n'
+    res += ' '.join(('  - Скорость:', str(wind['speed']), 'м/с')) + '\n'
+    res += ' '.join(('  - Направление:', wind_direction(wind['deg']))) + '\n\n'
+    res += ' '.join(('Закат:', sunset)) + '\n'
+    res += ' '.join(('Рассвет:', sunrise)) + '\n'
+
+    return res
+
+
+if __name__ == '__main__':
+    print(get_weather())
